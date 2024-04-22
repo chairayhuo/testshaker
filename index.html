@@ -23,7 +23,7 @@ function ready() {
         #define T iTime
         #define R iResolution
 
-        uniform vec3 u_color; // 添加颜色uniform
+        uniform float intensity;
 
         float map(in vec3 p) {
             return (1. + .2*sin(p.y*600.)) * 
@@ -57,23 +57,25 @@ function ready() {
             vec3 n = norm(p);
             float bw = n.x+n.y;
             bw *= SS(.9,.15,1./d);
-            // color = vec4(vec3(bw),1.0);
-            color = vec4(u_color * bw, 1.0); // use u_color to affect the final color
+            vec3 blackWhite = vec3(bw);
+            vec3 redTone = vec3(bw, 0.0, 0.0);
+            vec3 finalColor = mix(blackWhite, redTone, intensity);
+            color = vec4(finalColor, 1.0);
         }
  
     `; 
 
-    // 创建Uniforms对象，并初始化iTime
     const uniforms = new Uniforms({
-        iTime: 0,  // 初始化iTime
-        u_color: [1, 0, 0]  // 初始化颜色
+        intensity: 0.0  // 初始值为0.0
     });
 
-    // 创建Shader，并传入uniforms对象
-    const shader = new Shader(W, H, fragment, {iTime: 0, u_color: [0, 0, 0]}).center();
+    // 使用Uniforms对象创建Shader
+    let myShader = new Shader(W, H, fragment, uniforms).center();
 
     // Label to display shake intensity
     const statusLabel = new Label("Orientation: 0°", 20, "courier", "white").addTo().pos(20, 20);
+
+    // window.addEventListener('deviceorientation', handleOrientation);
 
     // 创建请求权限按钮
     let requestButton = new Button({
@@ -116,9 +118,8 @@ function ready() {
             const beta = Math.abs(event.beta); // 0-180
             const gamma = Math.abs(event.gamma); // 0-90
             const intensity = (alpha / 360 + beta / 180 + gamma / 90) / 3; // Normalize and average
-            const colorIntensity = Math.min(intensity, 1); // Ensure it's between 0 and 1
-            shader.uniforms.u_color = [colorIntensity, 0, 0];
-            statusLabel.text = `Orientation:\nα ${alpha.toFixed(2)}°\nβ ${beta.toFixed(2)}°\nγ ${gamma.toFixed(2)}°\nIntensity: ${intensity.toFixed(2)}\nColor Intensity: ${colorIntensity.toFixed(2)}`;
+            myShader.uniforms.intensity = intensity; // 更新着色器的intensity值
+            statusLabel.text = `Orientation:\nα ${alpha.toFixed(2)}°\nβ ${beta.toFixed(2)}°\nγ ${gamma.toFixed(2)}°\nIntensity: ${intensity.toFixed(2)}`;
         }
 
     });
