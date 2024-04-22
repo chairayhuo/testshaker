@@ -8,8 +8,12 @@
 
 import zim from "https://zimjs.org/cdn/016/zim";
 
+console.log("Initializing frame...");
+
 new Frame(FIT, 1024, 768, light, dark, ready);
 function ready() {
+
+    console.log("Frame is ready.");
     
     const fragment = `
     
@@ -42,7 +46,7 @@ function ready() {
     `; 
 
     new Shader(W,H,fragment).center();
-
+    console.log("Shader created and centered.");
 
     // Request permission for iOS 13+ devices
     if (typeof DeviceMotionEvent.requestPermission === 'function') {
@@ -53,7 +57,8 @@ function ready() {
         }).catch(console.error);
     } else {
         // Non-iOS devices
-        window.addEventListener('devicemotion', handleMotion);
+        // window.addEventListener('devicemotion', handleMotion);
+        // setupDeviceMotion();
     }
 
     function handleMotion(event) {
