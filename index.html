@@ -75,27 +75,64 @@ function ready() {
     // Label to display shake intensity
     const statusLabel = new Label("Shake intensity: 0", 20, "courier", "white").addTo().pos(20, 20);
 
-    function handleMotion(event) {
-        const acc = event.accelerationIncludingGravity;
-        const intensity = Math.sqrt(acc.x * acc.x + acc.y * acc.y + acc.z * acc.z);
-        const colorIntensity = Math.min(intensity / 10, 1); // Normalize and clamp the value between 0 and 1
-        shader.uniforms.u_color = [colorIntensity, 0, 0]; // Update red intensity based on shake
-        statusLabel.text = "Shake intensity: " + colorIntensity.toFixed(2);
-    }
+    // 创建请求权限按钮
+    let requestButton = new Button({
+        label: "PERMISSION",
+        width: 250,
+        height: 60,
+        backgroundColor: "orange",
+        rollBackgroundColor: "orangered",
+        corner: 10
+    }).pos(0,50,CENTER,BOTTOM); 
 
-    if (typeof DeviceMotionEvent.requestPermission === 'function') {
-        // Request permission for device motion on iOS 13+
-        DeviceMotionEvent.requestPermission().then(permissionState => {
-            if (permissionState === 'granted') {
-                window.addEventListener('devicemotion', handleMotion);
-            } else {
-                statusLabel.text = "Permission for motion sensors denied";
-            }
-        }).catch(console.error);
-    } else {
-        // Add event listener directly for non iOS 13+ devices
-        window.addEventListener('devicemotion', handleMotion);
-    }
+    requestButton.on("click", function() {
+
+        if (typeof DeviceMotionEvent.requestPermission === 'function') {
+            // 这是iOS 13+ 设备
+            DeviceMotionEvent.requestPermission()
+                .then(permissionState => {
+                    if (permissionState === 'granted') {
+                        window.addEventListener('devicemotion', handleMotion);
+                        console.log("devicemotion listener added"); // 确认监听器已添加
+                        requestButton.removeFrom();
+                    } else {
+                        alert("没有权限访问运动传感器");
+                    }
+                })
+                .catch(error=>{
+                    statusLabel.text = `Permission error: ${error}`;
+                });
+        } else {
+            // 非iOS 13+ 设备
+            window.addEventListener('devicemotion', handleMotion);
+            requestButton.removeFrom();
+            console.log("devicemotion listener added on non-iOS 13+ device");
+            statusLabel.text = "Permission API not needed or not supported.";
+        }
+
+        function handleMotion(event) {
+            const acc = event.accelerationIncludingGravity;
+            const intensity = Math.sqrt(acc.x * acc.x + acc.y * acc.y + acc.z * acc.z);
+            const colorIntensity = Math.min(intensity / 10, 1); // Normalize and clamp the value between 0 and 1
+            shader.uniforms.u_color = [colorIntensity, 0, 0]; // Update red intensity based on shake
+            statusLabel.text = "Shake intensity: " + colorIntensity.toFixed(2);
+        }
+
+        if (typeof DeviceMotionEvent.requestPermission === 'function') {
+            // Request permission for device motion on iOS 13+
+            DeviceMotionEvent.requestPermission().then(permissionState => {
+                if (permissionState === 'granted') {
+                    window.addEventListener('devicemotion', handleMotion);
+                } else {
+                    statusLabel.text = "Permission for motion sensors denied";
+                }
+            }).catch(console.error);
+        } else {
+            // Add event listener directly for non iOS 13+ devices
+            window.addEventListener('devicemotion', handleMotion);
+        }
+
+    });
         
 } // end ready
 
