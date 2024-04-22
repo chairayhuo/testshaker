@@ -45,31 +45,29 @@ function ready() {
         }
     `; 
 
-    // new Shader(W,H,fragment).center();
+    new Shader(W,H,fragment).center();
     console.log("Shader created and centered.");
 
-    new Circle(100, "red").center();
+    // Request permission for iOS 13+ devices
+    if (typeof DeviceMotionEvent.requestPermission === 'function') {
+        DeviceMotionEvent.requestPermission().then(permissionState => {
+            if (permissionState === 'granted') {
+                window.addEventListener('devicemotion', handleMotion);
+            }
+        }).catch(console.error);
+    } else {
+        // Non-iOS devices
+        // window.addEventListener('devicemotion', handleMotion);
+        // setupDeviceMotion();
+    }
 
-    // // Request permission for iOS 13+ devices
-    // if (typeof DeviceMotionEvent.requestPermission === 'function') {
-    //     DeviceMotionEvent.requestPermission().then(permissionState => {
-    //         if (permissionState === 'granted') {
-    //             window.addEventListener('devicemotion', handleMotion);
-    //         }
-    //     }).catch(console.error);
-    // } else {
-    //     // Non-iOS devices
-    //     // window.addEventListener('devicemotion', handleMotion);
-    //     // setupDeviceMotion();
-    // }
-
-    // function handleMotion(event) {
-    //     const acc = event.accelerationIncludingGravity;
-    //     let intensity = Math.sqrt(acc.x*acc.x + acc.y*acc.y + acc.z*acc.z); // Calculate intensity of motion
-    //     // Map intensity to a color range or shader parameter
-    //     let tempRange = remap(intensity, 0, 30, 1000, 30000); // Adjust range according to your needs
-    //     shader.updateUniform('end_temp', tempRange); // Update shader with new temp based on device motion
-    // }
+    function handleMotion(event) {
+        const acc = event.accelerationIncludingGravity;
+        let intensity = Math.sqrt(acc.x*acc.x + acc.y*acc.y + acc.z*acc.z); // Calculate intensity of motion
+        // Map intensity to a color range or shader parameter
+        let tempRange = remap(intensity, 0, 30, 1000, 30000); // Adjust range according to your needs
+        shader.updateUniform('end_temp', tempRange); // Update shader with new temp based on device motion
+    }
         
 } // end ready
 
