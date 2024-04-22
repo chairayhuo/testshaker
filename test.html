@@ -2,72 +2,81 @@
 <html>
 <head>
 <meta charset="utf-8" />
-<title>ZIM - Code Creativity</title>
+<title>Basic Fragment Shader</title>
 
+<!-- zimjs.com - JavaScript Canvas Framework -->
 <script type=module>
 
 import zim from "https://zimjs.org/cdn/016/zim";
 
-console.log("Initializing frame...");
-
+// See Docs under Frame for FIT, FILL, FULL, and TAG
 new Frame(FIT, 1024, 768, light, dark, ready);
 function ready() {
-
-    console.log("Frame is ready.");
     
+    // given F (Frame), S (Stage), W (width), H (height)
+    // put code here
+
+    // inside the fragment
+
+    // out vec4 fragColor;
+    // void main(){
+    //     fragColor = vec4(gl_FragCoord.x/iResolution.x,0,0,1);
+    //     // 1.-gl_FragCoord.y/iResolution.y to reverse (pay attention to the dot)
+    //     // gl_FragCoord.xy/iResolution.xy,0,1 (reduce a number)
+    // }
+
     const fragment = `
     
-	    //http://www.physics.sfasu.edu/astro/color/blackbody.html
+    uniform float green;
+    uniform vec3 color;
+    uniform float ratio;
 
-        vec3 star_color(float temp) {
-            float pt = pow(temp,-1.5)*1e5,
-                    lt = log(temp);
-            return clamp(vec3(
-                561. * pt + 148.,
-                temp > 6500. ? 352. * pt + 184. : 100.04 * lt - 623.6,
-                194.18 * lt - 1448.6)/255., 0., 1.);
-        }
+    void mainImage( out vec4 fragColor, in vec2 fragCoord){
+        
+        // fragColor = vec4(fragCoord.xy/iResolution.xy,0,1);
+        // fragColor = vec4(0,green,0,1);
+        // fragColor = vec4(color,1);
 
-        float remap(float v, float l1, float h1, float l2, float h2) {
-            return mix(l2, h2, (v - l1)  / (h1 - l1));
-        }
-
-        void mainImage( out vec4 fragColor, in vec2 fragCoord )
-        {
-            // Normalized pixel coordinates (from 0 to 1)
-            vec2 uv = fragCoord/iResolution.xy;
-            
-            float end_temp = remap(cos(iTime), -1.0, 1.0, 5000.0, 10000.0);
-            float temp = remap(uv.x, 0.0, 1.0, 1000.0, end_temp);
-
-            // Output to screen
-            fragColor = vec4(star_color(temp),1.0);
-        }
-    `; 
-
-    new Shader(W,H,fragment).center();
-    console.log("Shader created and centered.");
-
-    // Request permission for iOS 13+ devices
-    if (typeof DeviceMotionEvent.requestPermission === 'function') {
-        DeviceMotionEvent.requestPermission().then(permissionState => {
-            if (permissionState === 'granted') {
-                window.addEventListener('devicemotion', handleMotion);
-            }
-        }).catch(console.error);
-    } else {
-        // Non-iOS devices
-        // window.addEventListener('devicemotion', handleMotion);
-        // setupDeviceMotion();
+        // fragColor = mix(vec4(1,1,0,1),vec4(0,1,1,1),fragCoord.x / iResolution.x);
+        fragColor = mix(vec4(fragCoord.x / iResolution.x,1,0,1), vec4(0,fragCoord.y / iResolution.y,1,1), ratio);
+       
     }
 
-    function handleMotion(event) {
-        const acc = event.accelerationIncludingGravity;
-        let intensity = Math.sqrt(acc.x*acc.x + acc.y*acc.y + acc.z*acc.z); // Calculate intensity of motion
-        // Map intensity to a color range or shader parameter
-        let tempRange = remap(intensity, 0, 30, 1000, 30000); // Adjust range according to your needs
-        shader.updateUniform('end_temp', tempRange); // Update shader with new temp based on device motion
-    }
+    `;
+
+    const uniforms = new Uniforms({
+        green:1,
+        color:[0,0,.5],
+        ratio:.5
+    })
+    
+    new Shader(W,H,fragment,uniforms).center();
+
+    // timeout(1,()=>{
+    //     // uniforms.green=.5;
+    //     uniforms.color_C=.5
+    // });
+
+    // uniforms.animate({
+    //     props:{color_A:1,color_B:.5,color_C:0},
+    //     rewind:true,
+    //     loop:true
+    // });
+
+    // make a slider to change how blue it is
+
+    // const slider = new Slider({min:0,max:1,currentValue:uniforms.color_C}).center().change(()=>{
+    //     uniforms.color_C = 1-slider.currentValue;
+    //     zog(slider.currentValue);
+    // })
+
+    // new Slider({min:0,max:1,currentValue:uniforms.color_C})
+    //     .center()
+    //     .wire(uniforms,"color_C");
+
+    new Slider({min:0, max:1, currentValue:uniforms.ratio})
+                    .center()
+                    .wire(uniforms, "ratio");
         
 } // end ready
 
