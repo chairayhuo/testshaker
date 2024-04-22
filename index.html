@@ -70,7 +70,7 @@ function ready() {
     });
 
     // 创建Shader，并传入uniforms对象
-    const shader = new Shader(W, H, fragment, uniforms).center();
+    const shader = new Shader(W, H, fragment, {iTime: 0, u_color: [0, 0, 0]}).center();
 
     // Label to display shake intensity
     const statusLabel = new Label("Orientation: 0°", 20, "courier", "white").addTo().pos(20, 20);
@@ -118,21 +118,7 @@ function ready() {
             const intensity = (alpha / 360 + beta / 180 + gamma / 90) / 3; // Normalize and average
             const colorIntensity = Math.min(intensity, 1); // Ensure it's between 0 and 1
             shader.uniforms.u_color = [colorIntensity, 0, 0];
-            statusLabel.text = `Orientation: α ${alpha.toFixed(2)}°, β ${beta.toFixed(2)}°, γ ${gamma.toFixed(2)}°, Intensity: ${intensity.toFixed(2)}, Color Intensity: ${colorIntensity.toFixed(2)}`;
-        }
-
-        if (typeof DeviceMotionEvent.requestPermission === 'function') {
-            // Request permission for device motion on iOS 13+
-            DeviceMotionEvent.requestPermission().then(permissionState => {
-                if (permissionState === 'granted') {
-                    window.addEventListener('devicemotion', handleOrientation);
-                } else {
-                    statusLabel.text = "Permission for motion sensors denied";
-                }
-            }).catch(console.error);
-        } else {
-            // Add event listener directly for non iOS 13+ devices
-            window.addEventListener('devicemotion', handleOrientation);
+            statusLabel.text = `Orientation:\nα ${alpha.toFixed(2)}°\nβ ${beta.toFixed(2)}°\nγ ${gamma.toFixed(2)}°\nIntensity: ${intensity.toFixed(2)}\nColor Intensity: ${colorIntensity.toFixed(2)}`;
         }
 
     });
