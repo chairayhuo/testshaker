@@ -113,7 +113,7 @@ function ready() {
         function handleMotion(event) {
             const acc = event.accelerationIncludingGravity;
             const intensity = Math.sqrt(acc.x * acc.x + acc.y * acc.y + acc.z * acc.z);
-            const colorIntensity = Math.min(intensity / 10, 1); // Normalize and clamp the value between 0 and 1
+            const colorIntensity = Math.min(intensity / 30, 1); // Normalize and clamp the value between 0 and 1
             shader.uniforms.u_color = [colorIntensity, 0, 0]; // Update red intensity based on shake
             statusLabel.text = "Shake intensity: " + colorIntensity.toFixed(2);
         }
