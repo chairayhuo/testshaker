@@ -71,10 +71,9 @@ function ready() {
 
     // 创建Shader，并传入uniforms对象
     const shader = new Shader(W, H, fragment, uniforms).center();
-    updateUniforms(shader);
 
     // Label to display shake intensity
-    const statusLabel = new Label("Shake intensity: 0", 50, "courier", "white").addTo().pos(20, 20);
+    const statusLabel = new Label("Shake intensity: 0", 20, "courier", "white").addTo().pos(20, 20);
 
     function handleMotion(event) {
         const acc = event.accelerationIncludingGravity;
