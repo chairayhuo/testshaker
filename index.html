@@ -71,10 +71,10 @@ function ready() {
             }
 
             vec3 n = norm(p);
-            float bw = n.x+n.y;
-            vec3 hsv = rgb2hsv(vec3(bw, bw, bw));
-            hsv.x += intensity; // 调整色调
-            hsv.y *= intensity; // 调整饱和度
+            float bw = n.x + n.y; 
+            bw *= SS(.9, .15, 1.0 / d); 
+            float brightness = clamp(bw * 0.5 + 0.5 * intensity, 0.0, 1.0);
+            vec3 hsv = vec3(0.0, intensity, brightness); 
             vec3 finalColor = hsv2rgb(hsv);
             color = vec4(finalColor, 1.0);
         }
