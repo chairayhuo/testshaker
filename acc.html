@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>ZIM - Code Creativity</title>
+
+<!-- zimjs.com - JavaScript Canvas Framework -->
+<script type=module>
+
+import zim from "https://zimjs.org/cdn/016/zim";
+
+// See Docs under Frame for FIT, FILL, FULL, and TAG
+new Frame(FIT, 430, 932, dark, darker, ready);
+function ready() {
+    
+    // given F (Frame), S (Stage), W (width), H (height)
+    // put code here
+    
+    const fragment = ` // multiline string is backtick in top left keyboard
+
+        #define SS(a,b,c) smoothstep(a-b,a+b,c)
+        #define gyr(p) dot(sin(p.xyz),cos(p.zxy))
+        #define T iTime
+        #define R iResolution
+
+        uniform vec3 u_color; // 添加颜色uniform
+
+        float map(in vec3 p) {
+            return (1. + .2*sin(p.y*600.)) * 
+            gyr(( p*(10.) + .8*gyr(( p*8. )) )) *
+            (1.+sin(T+length(p.xy)*10.)) + 
+            .3 * sin(T*.15 + p.z * 5. + p.y) *
+            (2.+gyr(( p*(sin(T*.2+p.z*3.)*350.+250.) )));
+        }
+
+        vec3 norm(in vec3 p) {
+            float m = map(p);
+            vec2 d = vec2(.06+.06*sin(p.z),0.);
+            return map(p)-vec3(
+                map(p-d.xyy),map(p-d.yxy),map(p-d.yyx)
+            );
+        }
+
+        void mainImage( out vec4 color, in vec2 coord ) {
+            vec2 uv = coord/R.xy;
+            vec2 uvc = (coord-R.xy/2.)/R.y;
+            float d = 0.;
+            float dd = 1.;
+            vec3 p = vec3(0.,0.,T/4.);
+            vec3 rd = normalize(vec3(uvc.xy,1.));
+            for (float i=0.;i<90. && dd>.001 && d < 2.;i++) {
+                d += dd;
+                p += rd*d;
+                dd = map(p)*.02;
+            }
+
+            vec3 n = norm(p);
+            float bw = n.x+n.y;
+            bw *= SS(.9,.15,1./d);
+            // color = vec4(vec3(bw),1.0);
+            color = vec4(u_color * bw, 1.0); // 使用u_color影响最终颜色
+        }
+ 
+    `; 
+
+    // 创建Uniforms对象，并初始化iTime
+    const uniforms = new Uniforms({
+        iTime: 0,  // 初始化iTime
+        u_color: [1, 0, 0]  // 初始化颜色
+    });
+
+    // 创建Shader，并传入uniforms对象
+    const shader = new Shader(W, H, fragment, uniforms).center();
+
+    // Label to display shake intensity
+    const statusLabel = new Label("Shake intensity: 0", 20, "courier", "white").addTo().pos(20, 20);
+
+    // 创建请求权限按钮
+    let requestButton = new Button({
+        label: "PERMISSION",
+        width: 250,
+        height: 60,
+        backgroundColor: "orange",
+        rollBackgroundColor: "orangered",
+        corner: 10
+    }).pos(0,50,CENTER,BOTTOM); 
+
+    requestButton.on("click", function() {
+
+        if (typeof DeviceMotionEvent.requestPermission === 'function') {
+            // 这是iOS 13+ 设备
+            DeviceMotionEvent.requestPermission()
+                .then(permissionState => {
+                    if (permissionState === 'granted') {
+                        window.addEventListener('devicemotion', handleMotion);
+                        console.log("devicemotion listener added"); // 确认监听器已添加
+                        requestButton.removeFrom();
+                    } else {
+                        alert("没有权限访问运动传感器");
+                    }
+                })
+                .catch(error=>{
+                    statusLabel.text = `Permission error: ${error}`;
+                });
+        } else {
+            // 非iOS 13+ 设备
+            window.addEventListener('devicemotion', handleMotion);
+            requestButton.removeFrom();
+            console.log("devicemotion listener added on non-iOS 13+ device");
+            statusLabel.text = "Permission API not needed or not supported.";
+        }
+
+        function handleMotion(event) {
+            const acc = event.accelerationIncludingGravity;
+            const intensity = Math.sqrt(Math.max(0, (acc.x * acc.x + acc.y * acc.y + acc.z * acc.z) - (9.8 * 9.8)));
+            const colorIntensity = Math.min(intensity / 10, 1);  
+            shader.uniforms.u_color = [colorIntensity, 0, 0];
+            statusLabel.text = "Shake intensity: " + colorIntensity.toFixed(2);
+        }
+
+        if (typeof DeviceMotionEvent.requestPermission === 'function') {
+            // Request permission for device motion on iOS 13+
+            DeviceMotionEvent.requestPermission().then(permissionState => {
+                if (permissionState === 'granted') {
+                    window.addEventListener('devicemotion', handleMotion);
+                } else {
+                    statusLabel.text = "Permission for motion sensors denied";
+                }
+            }).catch(console.error);
+        } else {
+            // Add event listener directly for non iOS 13+ devices
+            window.addEventListener('devicemotion', handleMotion);
+        }
+
+    });
+        
+} // end ready
+
+</script>
+<meta name="viewport" content="width=device-width, user-scalable=no" />
+</head>
+<body></body>
+</html>
