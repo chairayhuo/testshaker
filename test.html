@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>ZIM - Code Creativity</title>
+
+<script type=module>
+
+import zim from "https://zimjs.org/cdn/016/zim";
+
+new Frame(FIT, 1024, 768, light, dark, ready);
+function ready() {
+    
+    const fragment = `
+    
+	    //http://www.physics.sfasu.edu/astro/color/blackbody.html
+
+        vec3 star_color(float temp) {
+            float pt = pow(temp,-1.5)*1e5,
+                    lt = log(temp);
+            return clamp(vec3(
+                561. * pt + 148.,
+                temp > 6500. ? 352. * pt + 184. : 100.04 * lt - 623.6,
+                194.18 * lt - 1448.6)/255., 0., 1.);
+        }
+
+        float remap(float v, float l1, float h1, float l2, float h2) {
+            return mix(l2, h2, (v - l1)  / (h1 - l1));
+        }
+
+        void mainImage( out vec4 fragColor, in vec2 fragCoord )
+        {
+            // Normalized pixel coordinates (from 0 to 1)
+            vec2 uv = fragCoord/iResolution.xy;
+            
+            float end_temp = remap(cos(iTime), -1.0, 1.0, 5000.0, 10000.0);
+            float temp = remap(uv.x, 0.0, 1.0, 1000.0, end_temp);
+
+            // Output to screen
+            fragColor = vec4(star_color(temp),1.0);
+        }
+    `; 
+
+    new Shader(W,H,fragment).center();
+
+
+    // Request permission for iOS 13+ devices
+    if (typeof DeviceMotionEvent.requestPermission === 'function') {
+        DeviceMotionEvent.requestPermission().then(permissionState => {
+            if (permissionState === 'granted') {
+                window.addEventListener('devicemotion', handleMotion);
+            }
+        }).catch(console.error);
+    } else {
+        // Non-iOS devices
+        window.addEventListener('devicemotion', handleMotion);
+    }
+
+    function handleMotion(event) {
+        const acc = event.accelerationIncludingGravity;
+        let intensity = Math.sqrt(acc.x*acc.x + acc.y*acc.y + acc.z*acc.z); // Calculate intensity of motion
+        // Map intensity to a color range or shader parameter
+        let tempRange = remap(intensity, 0, 30, 1000, 30000); // Adjust range according to your needs
+        shader.updateUniform('end_temp', tempRange); // Update shader with new temp based on device motion
+    }
+        
+} // end ready
+
+</script>
+<meta name="viewport" content="width=device-width, user-scalable=no" />
+</head>
+<body></body>
+</html>
