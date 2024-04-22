@@ -112,11 +112,9 @@ function ready() {
 
         function handleMotion(event) {
             const acc = event.accelerationIncludingGravity;
-            const intensity = Math.sqrt(acc.x * acc.x + acc.y * acc.y + acc.z * acc.z);
-            // 使用平方根函数改进敏感度，适当调整系数以匹配预期的动态范围
-            let colorIntensity = Math.sqrt(intensity / 50); // 除以一个较大的数字以减小基础值
-            colorIntensity = Math.min(colorIntensity, 1); // 确保不超过1
-            shader.uniforms.u_color = [colorIntensity, 0, 0]; // 更新红色强度
+            const intensity = Math.sqrt(Math.max(0, (acc.x * acc.x + acc.y * acc.y + acc.z * acc.z) - (9.8 * 9.8)));
+            const colorIntensity = Math.min(intensity / 10, 1);  // 这里的10是根据测试调整的分母
+            shader.uniforms.u_color = [colorIntensity, 0, 0];
             statusLabel.text = "Shake intensity: " + colorIntensity.toFixed(2);
         }
 
