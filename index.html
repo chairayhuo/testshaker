@@ -65,17 +65,10 @@ function ready() {
  
     `; 
 
-    const uniforms = new Uniforms({
-        intensity: 0.0  // 初始值为0.0
-    });
-
-    // 使用Uniforms对象创建Shader
-    let myShader = new Shader(W, H, fragment, uniforms).center();
-
     // Label to display shake intensity
     const statusLabel = new Label("Orientation: 0°", 20, "courier", "white").addTo().pos(20, 20);
 
-    // window.addEventListener('deviceorientation', handleOrientation);
+    // window.addEventListener('deviceorientation', handleOrientation); //for testing on Chrome
 
     // 创建请求权限按钮
     let requestButton = new Button({
@@ -89,6 +82,13 @@ function ready() {
     }).pos(0,50,CENTER,BOTTOM); 
 
     requestButton.on("click", function() {
+
+        const uniforms = new Uniforms({
+        intensity: 0.0  // 初始值为0.0
+    });
+
+    // 使用Uniforms对象创建Shader
+    let myShader = new Shader(W, H, fragment, uniforms).center();
 
         if (typeof DeviceMotionEvent.requestPermission === 'function') {
             // 这是iOS 13+ 设备
