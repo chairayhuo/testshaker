@@ -65,53 +65,53 @@ function ready() {
  
     `; 
 
-    // Label to display shake intensity
-    const statusLabel = new Label("Orientation: 0°", 20, "courier", "white").addTo().pos(20, 20);
-
-    // window.addEventListener('deviceorientation', handleOrientation); //for testing on Chrome
-
-    // 创建请求权限按钮
-    let requestButton = new Button({
-        label: "PERMISSION",
-        font:"courier",
-        width: 250,
-        height: 60,
-        backgroundColor: "orange",
-        rollBackgroundColor: "orangered",
-        corner: 10
-    }).pos(0,50,CENTER,BOTTOM); 
-
-    requestButton.on("click", function() {
-
-        const uniforms = new Uniforms({
+    const uniforms = new Uniforms({
         intensity: 0.0  // 初始值为0.0
     });
 
     // 使用Uniforms对象创建Shader
     let myShader = new Shader(W, H, fragment, uniforms).center();
 
-        if (typeof DeviceMotionEvent.requestPermission === 'function') {
-            // 这是iOS 13+ 设备
-            DeviceMotionEvent.requestPermission()
-                .then(permissionState => {
-                    if (permissionState === 'granted') {
-                        window.addEventListener('devicemotion', handleOrientation);
-                        console.log("devicemotion listener added"); // 确认监听器已添加
-                        requestButton.removeFrom();
-                    } else {
-                        alert("没有权限访问运动传感器");
-                    }
-                })
-                .catch(error=>{
-                    statusLabel.text = `Permission error: ${error}`;
-                });
-        } else {
-            // 非iOS 13+ 设备
-            window.addEventListener('devicemotion', handleOrientation);
-            requestButton.removeFrom();
-            console.log("devicemotion listener added on non-iOS 13+ device");
-            statusLabel.text = "Permission API not needed or not supported.";
-        }
+    // Label to display shake intensity
+    const statusLabel = new Label("Orientation: 0°", 20, "courier", "white").addTo().pos(20, 20);
+
+    window.addEventListener('deviceorientation', handleOrientation); //for testing on Chrome
+
+    // 创建请求权限按钮
+    // let requestButton = new Button({
+    //     label: "PERMISSION",
+    //     font:"courier",
+    //     width: 250,
+    //     height: 60,
+    //     backgroundColor: "orange",
+    //     rollBackgroundColor: "orangered",
+    //     corner: 10
+    // }).pos(0,50,CENTER,BOTTOM); 
+
+    // requestButton.on("click", function() {
+
+    //     if (typeof DeviceMotionEvent.requestPermission === 'function') {
+    //         // 这是iOS 13+ 设备
+    //         DeviceMotionEvent.requestPermission()
+    //             .then(permissionState => {
+    //                 if (permissionState === 'granted') {
+    //                     window.addEventListener('devicemotion', handleOrientation);
+    //                     console.log("devicemotion listener added"); // 确认监听器已添加
+    //                     requestButton.removeFrom();
+    //                 } else {
+    //                     alert("没有权限访问运动传感器");
+    //                 }
+    //             })
+    //             .catch(error=>{
+    //                 statusLabel.text = `Permission error: ${error}`;
+    //             });
+    //     } else {
+    //         // 非iOS 13+ 设备
+    //         window.addEventListener('devicemotion', handleOrientation);
+    //         requestButton.removeFrom();
+    //         console.log("devicemotion listener added on non-iOS 13+ device");
+    //         statusLabel.text = "Permission API not needed or not supported.";
+    //     }
 
         function handleOrientation(event) {
             const alpha = event.alpha; // 0-360
@@ -122,7 +122,7 @@ function ready() {
             statusLabel.text = `Orientation:\nα ${alpha.toFixed(2)}°\nβ ${beta.toFixed(2)}°\nγ ${gamma.toFixed(2)}°\nIntensity: ${intensity.toFixed(2)}`;
         }
 
-    });
+    // });
         
 } // end ready
 
