@@ -97,7 +97,7 @@ function ready() {
 
 
     // 创建物理世界，初始无重力
-    const physics = new Physics(0);
+    const physics = new Physics(0, null, true); 
 
     window.addEventListener('deviceorientation', handleOrientation); //for testing on Chrome
 
@@ -137,6 +137,8 @@ function ready() {
     //         statusLabel.text = "Permission API not needed or not supported.";
     //     }
 
+        const gravityScale = 9.8;  // 实际重力加速度
+
         function handleOrientation(event) {
             const alpha = event.alpha; // 0-360
             // const beta = Math.abs(event.beta); 
@@ -147,7 +149,6 @@ function ready() {
             statusLabel.text = `Orientation:\nα ${alpha.toFixed(2)}°\nβ ${beta.toFixed(2)}°\nγ ${gamma.toFixed(2)}°\nIntensity: ${intensity.toFixed(2)}`;
 
             // 根据beta和gamma调整重力
-            const gravityScale = 9.8;
             const gravityX = Math.sin(gamma * Math.PI / 180) * gravityScale;
             const gravityY = Math.sin(beta * Math.PI / 180) * gravityScale;
 
@@ -190,8 +191,10 @@ function ready() {
             rock.x = x+50;
             rock.y = y+60;
             rock.addPhysics({
-                bounciness: .5,
-                linear: 1 // damping as it moving
+                bounciness: .6,
+                // linear: 1 // damping as it moving
+                friction: 0.2,    // 降低摩擦力
+                shape: "circle"   // 使用圆形碰撞体，有时可以帮助防止卡住
             });
             console.log(rock.x, rock.y);
             S.update();
