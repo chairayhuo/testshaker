@@ -4,10 +4,10 @@
 <meta charset="utf-8" />
 <title>test shaker</title>
 
-<!-- zimjs.com - JavaScript Canvas Framework -->
+<script src="https://d309knd7es5f10.cloudfront.net/Box2dWeb-2.1.a.3.min.js"></script>
+<script src="https://zimjs.org/cdn/016/zim_physics.js" type="module"></script>
 <script type=module>
 
-// import zim from "https://zimjs.org/cdn/016/zim";
 import zim from "https://zimjs.org/cdn/016/zim_physics";
 
 // See Docs under Frame for FIT, FILL, FULL, and TAG
@@ -94,6 +94,9 @@ function ready() {
     // Label to display shake intensity
     const statusLabel = new Label("Orientation: 0°", 20, "courier", "white").addTo().pos(20, 20);
 
+    // 创建物理世界，初始无重力
+    const physics = new Physics(0);
+
     window.addEventListener('deviceorientation', handleOrientation); //for testing on Chrome
 
     // 创建请求权限按钮
@@ -134,15 +137,21 @@ function ready() {
 
         function handleOrientation(event) {
             const alpha = event.alpha; // 0-360
-            const beta = Math.abs(event.beta); // 0-180
-            const gamma = Math.abs(event.gamma); // 0-90
+            // const beta = Math.abs(event.beta); 
+            const beta = event.beta; // -180到180
+            const gamma = event.gamma; // -90到90
             const intensity = (alpha / 360 + beta / 180 + gamma / 90) / 3; // Normalize and average
             myShader.uniforms.intensity = intensity; // 更新着色器的intensity值
             statusLabel.text = `Orientation:\nα ${alpha.toFixed(2)}°\nβ ${beta.toFixed(2)}°\nγ ${gamma.toFixed(2)}°\nIntensity: ${intensity.toFixed(2)}`;
-        }
 
-        const physics = new Physics();
-        console.log(Physics);
+            // 根据beta和gamma调整重力
+            const gravityX = Math.sin(gamma * Math.PI / 180);
+            const gravityY = Math.sin(beta * Math.PI / 180);
+
+            // 设置物理世界的重力
+            physics.world.SetGravity(new Box2D.Common.Math.b2Vec2(gravityX, gravityY)); // 正确使用Box2D API设置重力
+            zog("gravity", physics.gravity.x, physics.gravity.y);
+        }
 
         let longPressTimer;
         document.addEventListener("touchstart", function(e) {
