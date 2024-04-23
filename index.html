@@ -147,8 +147,9 @@ function ready() {
             statusLabel.text = `Orientation:\nα ${alpha.toFixed(2)}°\nβ ${beta.toFixed(2)}°\nγ ${gamma.toFixed(2)}°\nIntensity: ${intensity.toFixed(2)}`;
 
             // 根据beta和gamma调整重力
-            const gravityX = Math.sin(gamma * Math.PI / 180);
-            const gravityY = Math.sin(beta * Math.PI / 180);
+            const gravityScale = 9.8;
+            const gravityX = Math.sin(gamma * Math.PI / 180) * gravityScale;
+            const gravityY = Math.sin(beta * Math.PI / 180) * gravityScale;
 
             // 设置物理世界的重力
             physics.world.SetGravity(new Box2D.Common.Math.b2Vec2(gravityX, gravityY)); // 正确使用Box2D API设置重力
