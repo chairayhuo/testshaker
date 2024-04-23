@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>test shaker</title>
+
+<!-- zimjs.com - JavaScript Canvas Framework -->
+<script type=module>
+
+import zim from "https://zimjs.org/cdn/016/zim_physics";
+
+// See Docs under Frame for FIT, FILL, FULL, and TAG
+const assets = ["rock.png"];
+const path = "assets/";
+new Frame(FIT, 430, 932, dark, darker, ready, assets, path);
+function ready() {
+    
+    // given F (Frame), S (Stage), W (width), H (height)
+    // put code here
+
+    const physics = new Physics();
+    console.log(Physics);
+
+    // document.addEventListener("touchstart", function(e) {
+    //     console.log("Touch event detected!");
+    // });
+
+    // 使用document监听器代替S
+    let longPressTimer;
+    document.addEventListener("touchstart", function(e) {
+        e.preventDefault();
+        console.log("touch start");
+        longPressTimer = setTimeout(() => {
+
+            let touch = e.changedTouches[0];
+            // 获取触摸点相对于浏览器视口的位置
+            let rect = S.canvas.getBoundingClientRect();
+            // 转换触摸点坐标到相对于画布的位置
+            let x = touch.clientX - rect.left;
+            let y = touch.clientY - rect.top;
+            // 转换坐标到舞台
+            let localPoint = S.globalToLocal(x, y);
+            console.log("Touch at stage:", localPoint.x, localPoint.y);
+            createRock(localPoint.x, localPoint.y);
+            
+        }, 500); // 500毫秒长按阈值
+    }, { passive: false });
+
+    document.addEventListener("touchend", function(e) {
+        console.log("touch end");
+        clearTimeout(longPressTimer);
+    });
+
+    function createRock(x, y) {
+        const rock = new Pic("rock.png", path).sca(.4).centerReg();
+        rock.x = x+50;
+        rock.y = y+60;
+        rock.addPhysics({
+            bounciness: .5,
+            linear: 1 // damping as it moving
+        });
+        console.log(rock.x, rock.y);
+        S.update();
+    }
+        
+} // end ready
+
+</script>
+<meta name="viewport" content="width=device-width, user-scalable=no" />
+</head>
+<body></body>
+</html>
