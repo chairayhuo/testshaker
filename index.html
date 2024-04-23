@@ -187,13 +187,12 @@ function ready() {
         });
 
         function createRock(x, y) {
-            const rock = new Pic("rock.png", path).sca(.4).centerReg();
+            const rock = new Pic("rock.png", path).sca(.2).centerReg();
             rock.x = x+50;
             rock.y = y+60;
             rock.addPhysics({
                 bounciness: .6,
-                // linear: 1 // damping as it moving
-                friction: 0.2,    // 降低摩擦力
+                friction: 0.1,    // 降低摩擦力
                 shape: "circle"   // 使用圆形碰撞体，有时可以帮助防止卡住
             });
             console.log(rock.x, rock.y);
