@@ -18,41 +18,50 @@ function ready() {
     // given F (Frame), S (Stage), W (width), H (height)
     // put code here
 
-        const physics = new Physics();
+    const physics = new Physics();
+    console.log(Physics);
 
-        // 监听长按事件
-        let longPressTimer;
-        S.on("mousedown", function(e) {
-            zog("mouse down");
-            longPressTimer = setTimeout(() => {
-                createRock(e.stageX, e.stageY);
-            }, 500); // 500毫秒长按阈值
-        });
-
-        S.on("mouseup", function() {
-            zog("mouse up");
-            clearTimeout(longPressTimer); // 取消长按定时器
-        });
-
-        function createRock(x, y) {
-            const rock = new Pic("rock.png", path).sca(.4).centerReg();
-            rock.x = x;
-            rock.y = y;
-            rock.addPhysics({
-                bounciness: .5,
-                linear: 1 // damping as it moving
-            });
-            S.update();
-        }
-
-        // const rock = new Pic("rock.png").sca(.4).centerReg();
-        // rock.addPhysics({
-        //     bounciness:.5,
-        //     linear:1 // damping as it moving
-        // });
-
-
+    // document.addEventListener("touchstart", function(e) {
+    //     console.log("Touch event detected!");
     // });
+
+    // 使用document监听器代替S
+    let longPressTimer;
+    document.addEventListener("touchstart", function(e) {
+        e.preventDefault();
+        console.log("touch start");
+        longPressTimer = setTimeout(() => {
+
+            let touch = e.changedTouches[0];
+            // 获取触摸点相对于浏览器视口的位置
+            let rect = S.canvas.getBoundingClientRect();
+            // 转换触摸点坐标到相对于画布的位置
+            let x = touch.clientX - rect.left;
+            let y = touch.clientY - rect.top;
+            // 转换坐标到舞台
+            let localPoint = S.globalToLocal(x, y);
+            console.log("Touch at stage:", localPoint.x, localPoint.y);
+            createRock(localPoint.x, localPoint.y);
+            
+        }, 500); // 500毫秒长按阈值
+    }, { passive: false });
+
+    document.addEventListener("touchend", function(e) {
+        console.log("touch end");
+        clearTimeout(longPressTimer);
+    });
+
+    function createRock(x, y) {
+        const rock = new Pic("rock.png", path).sca(.4).centerReg();
+        rock.x = x+50;
+        rock.y = y+60;
+        rock.addPhysics({
+            bounciness: .5,
+            linear: 1 // damping as it moving
+        });
+        console.log(rock.x, rock.y);
+        S.update();
+    }
         
 } // end ready
 
