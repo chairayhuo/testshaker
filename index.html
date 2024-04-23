@@ -93,6 +93,8 @@ function ready() {
 
     // Label to display shake intensity
     const statusLabel = new Label("Orientation: 0°", 20, "courier", "white").addTo().pos(20, 20);
+    const gravityLabel = new Label("Gravity: 0, 0", 20, "courier", "white").addTo().pos(20, 95);
+
 
     // 创建物理世界，初始无重力
     const physics = new Physics(0);
@@ -150,7 +152,11 @@ function ready() {
 
             // 设置物理世界的重力
             physics.world.SetGravity(new Box2D.Common.Math.b2Vec2(gravityX, gravityY)); // 正确使用Box2D API设置重力
-            zog("gravity", physics.gravity.x, physics.gravity.y);
+            
+            // 获取并显示重力向量
+            const gravityVector = physics.world.GetGravity();
+            zog("gravity", gravityVector.x, gravityVector.y);
+            gravityLabel.text = `Gravity: ${gravityVector.x.toFixed(2)}, ${gravityVector.y.toFixed(2)}`;
         }
 
         let longPressTimer;
