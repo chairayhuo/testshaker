@@ -191,8 +191,8 @@ function ready() {
             rock.x = x+50;
             rock.y = y+60;
             rock.addPhysics({
-                bounciness: .6,
-                friction: 0.1,    // 降低摩擦力
+                bounciness: .7,
+                friction: 0.05,    // 降低摩擦力
                 shape: "circle"   // 使用圆形碰撞体，有时可以帮助防止卡住
             });
             console.log(rock.x, rock.y);
