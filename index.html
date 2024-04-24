@@ -138,6 +138,7 @@ function ready() {
     //     }
 
         const gravityScale = 9.8;  // 实际重力加速度
+        const scaleMultiplier = 5;  // 增加这个乘数以增强倾斜导致的重力效应
 
         function handleOrientation(event) {
             const alpha = event.alpha; // 0-360
@@ -149,8 +150,8 @@ function ready() {
             statusLabel.text = `Orientation:\nα ${alpha.toFixed(2)}°\nβ ${beta.toFixed(2)}°\nγ ${gamma.toFixed(2)}°\nIntensity: ${intensity.toFixed(2)}`;
 
             // 根据beta和gamma调整重力
-            const gravityX = Math.sin(gamma * Math.PI / 180) * gravityScale;
-            const gravityY = Math.sin(beta * Math.PI / 180) * gravityScale;
+            const gravityX = Math.sin(gamma * Math.PI / 180) * gravityScale * scaleMultiplier;
+            const gravityY = Math.sin(beta * Math.PI / 180) * gravityScale * scaleMultiplier;
 
             // 设置物理世界的重力
             physics.world.SetGravity(new Box2D.Common.Math.b2Vec2(gravityX, gravityY)); // 正确使用Box2D API设置重力
@@ -192,7 +193,8 @@ function ready() {
             rock.y = y+60;
             rock.addPhysics({
                 bounciness: .7,
-                friction: 0.05,    // 降低摩擦力
+                friction: 0.1,    // 降低摩擦力
+                linearDamping: 0.1, // 降低线性阻尼
                 shape: "circle"   // 使用圆形碰撞体，有时可以帮助防止卡住
             });
             console.log(rock.x, rock.y);
