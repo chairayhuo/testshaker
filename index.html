@@ -193,14 +193,20 @@ function ready() {
         });
 
         function createRock(x, y) {
-            const rock = new Pic("rock.png", path).sca(.2).centerReg();
+            const rock = new Pic("rock.png", path).sca(0).centerReg().addTo();   
             rock.x = x+50;
             rock.y = y+60;
-            rock.addPhysics({
-                bounciness: .7,
-                friction: 0.1,    // 降低摩擦力
-                linearDamping: 0.1, // 降低线性阻尼
-                shape: "circle"   // 使用圆形碰撞体，有时可以帮助防止卡住
+            rock.animate({
+                props: {scale: 0.4},
+                time: 1,
+                call: function() {
+                    rock.addPhysics({
+                        bounciness: 0.7,
+                        friction: 0.1,
+                        linearDamping: 0.1,
+                        shape: "circle"
+                    });
+                }
             });
             console.log(rock.x, rock.y);
             S.update();
