@@ -166,7 +166,10 @@ function ready() {
         document.addEventListener("touchstart", function(e) {
             e.preventDefault();
             console.log("touch start");
-            instruction.removeFrom();
+            instruction.text = "";
+            timeout(1,()=>{
+                instruction.text = "Release to Create Rock";
+            })
             longPressTimer = setTimeout(() => {
 
                 let touch = e.changedTouches[0];
@@ -185,7 +188,7 @@ function ready() {
 
         document.addEventListener("touchend", function(e) {
             console.log("touch end");
-            instruction.center();
+            instruction.text = "Long Press Anywhere";
             clearTimeout(longPressTimer);
         });
 
