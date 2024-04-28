@@ -11,7 +11,7 @@
 import zim from "https://zimjs.org/cdn/016/zim_physics";
 
 // See Docs under Frame for FIT, FILL, FULL, and TAG
-const assets = ["rock.png"];
+const assets = ["rock.png", "collisionSound.m4a"];
 const path = "assets/";
 new Frame(FIT, 430, 932, dark, darker, ready, assets, path);
 function ready() {
@@ -98,6 +98,8 @@ function ready() {
 
     // 创建物理世界，初始无重力
     const physics = new Physics(0, null, true); 
+
+    const collisionSound = new Aud("collisionSound.m4a");
 
     window.addEventListener('deviceorientation', handleOrientation); //for testing on Chrome
 
@@ -201,10 +203,12 @@ function ready() {
                 time: 1,
                 call: function() {
                     rock.addPhysics({
-                        bounciness: 0.7,
+                        // bounciness: 0.7,
                         friction: 0.1,
                         linearDamping: 0.1,
                         shape: "circle"
+                    }).contact(() => {
+                        collisionSound.play();
                     });
                 }
             });
