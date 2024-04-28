@@ -11,7 +11,7 @@
 import zim from "https://zimjs.org/cdn/016/zim_physics";
 
 // See Docs under Frame for FIT, FILL, FULL, and TAG
-const assets = ["rock.png", "collisionSound.m4a"];
+const assets = ["rock.png", "collisionSound.m4a", "bgSound.m4a"];
 const path = "assets/";
 new Frame(FIT, 430, 932, dark, darker, ready, assets, path);
 function ready() {
@@ -101,43 +101,46 @@ function ready() {
 
     const collisionSound = new Aud("collisionSound.m4a");
 
-    window.addEventListener('deviceorientation', handleOrientation); //for testing on Chrome
+    const bgSound = new Aud("bgSound.m4a");
+
+    // window.addEventListener('deviceorientation', handleOrientation); //for testing on Chrome
 
     // 创建请求权限按钮
-    // let requestButton = new Button({
-    //     label: "PERMISSION",
-    //     font:"courier",
-    //     width: 250,
-    //     height: 60,
-    //     backgroundColor: "orange",
-    //     rollBackgroundColor: "orangered",
-    //     corner: 10
-    // }).pos(0,50,CENTER,BOTTOM); 
+    let requestButton = new Button({
+        label: new Label("PERMISSION", 40,"courier"),
+        width: 260,
+        height: 40,
+        backgroundColor: "white",
+        rollBackgroundColor: "orangered",
+        corner: 0
+    }).pos(0,50,CENTER,BOTTOM); 
 
-    // requestButton.on("click", function() {
+    requestButton.on("click", function() {
 
-    //     if (typeof DeviceMotionEvent.requestPermission === 'function') {
-    //         // 这是iOS 13+ 设备
-    //         DeviceMotionEvent.requestPermission()
-    //             .then(permissionState => {
-    //                 if (permissionState === 'granted') {
-    //                     window.addEventListener('devicemotion', handleOrientation);
-    //                     console.log("devicemotion listener added"); // 确认监听器已添加
-    //                     requestButton.removeFrom();
-    //                 } else {
-    //                     alert("没有权限访问运动传感器");
-    //                 }
-    //             })
-    //             .catch(error=>{
-    //                 statusLabel.text = `Permission error: ${error}`;
-    //             });
-    //     } else {
-    //         // 非iOS 13+ 设备
-    //         window.addEventListener('devicemotion', handleOrientation);
-    //         requestButton.removeFrom();
-    //         console.log("devicemotion listener added on non-iOS 13+ device");
-    //         statusLabel.text = "Permission API not needed or not supported.";
-    //     }
+        bgSound.play({loop:true});
+
+        if (typeof DeviceMotionEvent.requestPermission === 'function') {
+            // 这是iOS 13+ 设备
+            DeviceMotionEvent.requestPermission()
+                .then(permissionState => {
+                    if (permissionState === 'granted') {
+                        window.addEventListener('devicemotion', handleOrientation);
+                        console.log("devicemotion listener added"); // 确认监听器已添加
+                        requestButton.removeFrom();
+                    } else {
+                        alert("没有权限访问运动传感器");
+                    }
+                })
+                .catch(error=>{
+                    statusLabel.text = `Permission error: ${error}`;
+                });
+        } else {
+            // 非iOS 13+ 设备
+            window.addEventListener('devicemotion', handleOrientation);
+            requestButton.removeFrom();
+            console.log("devicemotion listener added on non-iOS 13+ device");
+            statusLabel.text = "Permission API not needed or not supported.";
+        }
 
         const gravityScale = 9.8;  // 实际重力加速度
         const scaleMultiplier = 1;  // 增加这个乘数以增强倾斜导致的重力效应
@@ -216,7 +219,7 @@ function ready() {
             S.update();
         }
 
-    // });
+    });
         
 } // end ready
 
