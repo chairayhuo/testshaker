@@ -91,10 +91,6 @@ function ready() {
     // 使用Uniforms对象创建Shader
     let myShader = new Shader(W, H, fragment, uniforms).center();
 
-    const statusLabel = new Label("Orientation: 0°", 20, "courier", "white").addTo().pos(20, 20);
-    const gravityLabel = new Label("Gravity: 0, 0", 20, "courier", "white").addTo().pos(20, 95);
-    const instruction = new Label("Long Press Anywhere", 20, "courier", "white").center();
-
 
     // 创建物理世界，初始无重力
     const physics = new Physics(0, null, true); 
@@ -105,17 +101,37 @@ function ready() {
 
     // window.addEventListener('deviceorientation', handleOrientation); //for testing on Chrome
 
-    // 创建请求权限按钮
+
+    let intro = new Label("Into the Unknown", 30, "courier", "white").center();
+    intro.animate({
+        props: {alpha: 0},
+        time: 2,
+        delay: 2,
+        loop:true
+        // call: function() {
+        //     intro.removeFrom();
+        // }
+    });
+
     let requestButton = new Button({
-        label: new Label("PERMISSION", 40,"courier"),
+        label: new Label("START", 40,"courier"),
         width: 260,
         height: 40,
         backgroundColor: "white",
         rollBackgroundColor: "orangered",
         corner: 0
-    }).pos(0,50,CENTER,BOTTOM); 
+    }).pos(0,50,CENTER,CENTER); 
 
     requestButton.on("click", function() {
+
+        intro.removeFrom();
+        requestButton.removeFrom();
+
+        const statusLabel = new Label("Orientation: 0°", 20, "courier", "white").addTo().pos(20, 20);
+        const gravityLabel = new Label("Gravity: 0, 0", 20, "courier", "white").addTo().pos(20, 95);
+        const instruction = new Label("Long Press Anywhere", 20, "courier", "white").center();
+
+        bgSound.play({loop:true});
 
         if (typeof DeviceMotionEvent.requestPermission === 'function') {
             // 这是iOS 13+ 设备
@@ -124,7 +140,6 @@ function ready() {
                     if (permissionState === 'granted') {
                         window.addEventListener('deviceorientation', handleOrientation);
                         console.log("devicemotion listener added"); // 确认监听器已添加
-                        requestButton.removeFrom();
                     } else {
                         alert("没有权限访问运动传感器");
                     }
@@ -135,7 +150,6 @@ function ready() {
         } else {
             // 非iOS 13+ 设备
             window.addEventListener('deviceorientation', handleOrientation);
-            requestButton.removeFrom();
             console.log("devicemotion listener added on non-iOS 13+ device");
             // statusLabel.text = "Permission API not needed or not supported.";
         }
@@ -200,7 +214,7 @@ function ready() {
             rock.x = x+50;
             rock.y = y+60;
             rock.animate({
-                props: {scale: 0.4},
+                props: {scale: 0.3},
                 time: 1,
                 call: function() {
                     rock.addPhysics({
