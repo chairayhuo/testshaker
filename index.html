@@ -101,7 +101,7 @@ function ready() {
 
     const collisionSound = new Aud("collisionSound.m4a");
 
-    const bgSound = new Aud("bgSound.m4a");
+    const bgSound = new Aud("bgSound.m4a", 1, true);
 
     // window.addEventListener('deviceorientation', handleOrientation); //for testing on Chrome
 
@@ -117,14 +117,12 @@ function ready() {
 
     requestButton.on("click", function() {
 
-        bgSound.play({loop:true});
-
         if (typeof DeviceMotionEvent.requestPermission === 'function') {
             // 这是iOS 13+ 设备
             DeviceMotionEvent.requestPermission()
                 .then(permissionState => {
                     if (permissionState === 'granted') {
-                        window.addEventListener('devicemotion', handleOrientation);
+                        window.addEventListener('deviceorientation', handleOrientation);
                         console.log("devicemotion listener added"); // 确认监听器已添加
                         requestButton.removeFrom();
                     } else {
@@ -136,10 +134,10 @@ function ready() {
                 });
         } else {
             // 非iOS 13+ 设备
-            window.addEventListener('devicemotion', handleOrientation);
+            window.addEventListener('deviceorientation', handleOrientation);
             requestButton.removeFrom();
             console.log("devicemotion listener added on non-iOS 13+ device");
-            statusLabel.text = "Permission API not needed or not supported.";
+            // statusLabel.text = "Permission API not needed or not supported.";
         }
 
         const gravityScale = 9.8;  // 实际重力加速度
